@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo: Um Olhar do Paraíso</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        .question {
+            margin: 15px 0;
+            text-align: left;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .feedback {
+            display: none;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .correct {
+            color: green;
+        }
+        .incorrect {
+            color: red;
+        }
+        #result {
+            display: none;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        #credits {
+            font-size: 16px;
+            margin-top: 20px;
+            font-style: italic;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Quiz: Um Olhar do Paraíso</h1>
+    <div id="question" class="question"></div>
+    <div id="options"></div>
+    <div id="feedback" class="feedback"></div>
+    <div id="result"></div>
+    <div id="credits"></div> <!-- Div para os créditos -->
+</div>
+
+<script>
+    let currentQuestion = 0;
+    let score = 0;
+    let answers = [];
+
+    // Perguntas e respostas
+    const questions = [
+        // 1º arquivo (5 questões)
+        {
+            question: "Quem é a personagem principal do filme 'Um Olhar do Paraíso'?",
+            options: ['Susie Salmon', 'Abigail Salmon', 'Jack Salmon'],
+            correctAnswer: 0, // Índice da resposta correta (Susie Salmon)
+        },
+        {
+            question: "Onde Susie é assassinada no filme?",
+            options: ['Na escola', 'Em um campo de futebol', 'Em uma casa subterrânea'],
+            correctAnswer: 2, // Índice da resposta correta (Em uma casa subterrânea)
+        },
+        {
+            question: "Quem é o assassino de Susie Salmon?",
+            options: ['George Harvey', 'Mr. Harvey', 'Ray Singh'],
+            correctAnswer: 0, // Índice da resposta correta (George Harvey)
+        },
+        {
+            question: "Onde Susie vai após morrer?",
+            options: ['Para o céu', 'Para um paraíso particular', 'Para a casa de seus pais'],
+            correctAnswer: 1, // Índice da resposta correta (Para um paraíso particular)
+        },
+        {
+            question: "Quem é o amor de Susie no filme?",
+            options: ['Ray Singh', 'Jack Salmon', 'Jeremy'],
+            correctAnswer: 0, // Índice da resposta correta (Ray Singh)
+        },
+        
+        // 2º arquivo (5 questões)
+        {
+            question: "Quem é a diretora do filme?",
+            options: ['Peter Jackson', 'Steven Spielberg', 'Catherine Hardwicke'],
+            correctAnswer: 0, // Índice da resposta correta (Peter Jackson)
+        },
+        {
+            question: "Em que ano foi lançado o filme 'Um Olhar do Paraíso'?",
+            options: ['2009', '2010', '2008'],
+            correctAnswer: 0, // Índice da resposta correta (2009)
+        },
+        {
+            question: "Qual é o nome da atriz que interpreta Susie Salmon?",
+            options: ['Saoirse Ronan', 'Emma Watson', 'Jennifer Lawrence'],
+            correctAnswer: 0, // Índice da resposta correta (Saoirse Ronan)
+        },
+        {
+            question: "Qual é o nome do pai de Susie no filme?",
+            options: ['Jack Salmon', 'George Harvey', 'Ray Singh'],
+            correctAnswer: 0, // Índice da resposta correta (Jack Salmon)
+        },
+        {
+            question: "O que Susie observa de seu paraíso após sua morte?",
+            options: ['Sua família', 'O assassino', 'O assassino e sua família'],
+            correctAnswer: 0, // Índice da resposta correta (Sua família)
+        },
+        
+        // 3º arquivo (5 questões)
+        {
+            question: "Quem é a mãe de Susie no filme?",
+            options: ['Abigail Salmon', 'Susan Harvey', 'Janet Harvey'],
+            correctAnswer: 0, // Índice da resposta correta (Abigail Salmon)
+        },
+        {
+            question: "Onde Susie passa a maior parte de seu tempo no paraíso?",
+            options: ['Em uma escola', 'Em uma floresta', 'Em uma casa'],
+            correctAnswer: 1, // Índice da resposta correta (Em uma floresta)
+        },
+        {
+            question: "Qual é o nome da casa subterrânea onde Susie é assassinada?",
+            options: ['A casa da esquina', 'A casa dos horrores', 'A casa de vidro'],
+            correctAnswer: 0, // Índice da resposta correta (A casa da esquina)
+        },
+        {
+            question: "Quem ajuda Susie a tentar desvendar o mistério do seu assassinato?",
+            options: ['Jack Salmon', 'Ray Singh', 'Abigail Salmon'],
+            correctAnswer: 1, // Índice da resposta correta (Ray Singh)
+        },
+        {
+            question: "O que Susie faz para tentar enviar uma mensagem para sua família?",
+            options: ['Ela escreve uma carta', 'Ela desenha', 'Ela usa uma câmera de vídeo'],
+            correctAnswer: 1, // Índice da resposta correta (Ela desenha)
+        },
+        
+        // 4º arquivo (5 questões)
+        {
+            question: "Onde Susie se encontra com Ray Singh depois de sua morte?",
+            options: ['No céu', 'Na escola', 'No seu paraíso'],
+            correctAnswer: 2, // Índice da resposta correta (No seu paraíso)
+        },
+        {
+            question: "Qual é o nome do filme que Susie assiste junto com sua mãe em um flashback?",
+            options: ['O Mágico de Oz', 'Casablanca', 'O Vingador do Futuro'],
+            correctAnswer: 0, // Índice da resposta correta (O Mágico de Oz)
+        },
+        {
+            question: "Qual personagem é o detetive que investiga o assassinato de Susie?",
+            options: ['Detective Fenerman', 'Detective Thompson', 'Detective Martinez'],
+            correctAnswer: 0, // Índice da resposta correta (Detective Fenerman)
+        },
+        {
+            question: "Quem aparece para ajudar Susie a entender o que aconteceu após sua morte?",
+            options: ['A avó', 'O pai', 'O avô'],
+            correctAnswer: 2, // Índice da resposta correta (O avô)
+        },
+        {
+            question: "Onde Susie observa pela última vez o assassino?",
+            options: ['Na rua', 'Na praça', 'Na casa de George Harvey'],
+            correctAnswer: 0, // Índice da resposta correta (Na rua)
+        }
+    ];
+
+    // Função para exibir a pergunta atual
+    function showQuestion() {
+        const question = questions[currentQuestion];
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const feedbackElement = document.getElementById('feedback');
+        
+        questionElement.textContent = question.question;
+        optionsElement.innerHTML = '';
+        
+        question.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.textContent = option;
+            button.onclick = () => checkAnswer(index);
+            optionsElement.appendChild(button);
+        });
+        
+        feedbackElement.style.display = 'none';
+    }
+
+    // Função para verificar a resposta
+    function checkAnswer(selectedIndex) {
+        const question = questions[currentQuestion];
+        const feedbackElement = document.getElementById('feedback');
+        
+        answers.push({
+            question: question.question,
+            selectedAnswer: question.options[selectedIndex],
+            correctAnswer: question.options[question.correctAnswer],
+            isCorrect: selectedIndex === question.correctAnswer
+        });
+
+        if (selectedIndex === question.correctAnswer) {
+            score++;
+            feedbackElement.textContent = "Correto!";
+            feedbackElement.style.color = 'green';
+        } else {
+            feedbackElement.textContent = "Errado! A resposta correta era: " + question.options[question.correctAnswer];
+            feedbackElement.style.color = 'red';
+        }
+        
+        feedbackElement.style.display = 'block';
+        
+        // Avançar para a próxima pergunta ou mostrar o resultado
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            setTimeout(showQuestion, 2000); // Espera 2 segundos para mostrar a próxima pergunta
+        } else {
+            setTimeout(showResult, 2000);
+        }
+    }
+
+    // Função para mostrar o resultado final
+    function showResult() {
+        const resultElement = document.getElementById('result');
+        resultElement.innerHTML = `<h2>Resultado Final</h2>
+        <p>Você acertou ${score} de ${questions.length} perguntas.</p>
+        <p>Abaixo estão suas respostas:</p>`;
+        
+        answers.forEach(answer => {
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>${answer.question}</strong><br>
+            Sua resposta: ${answer.selectedAnswer} <br>
+            Resposta correta: ${answer.correctAnswer} <br><br>`;
+            resultElement.appendChild(p);
+        });
+
+        resultElement.style.display = 'block';
+        
+        // Adicionando os créditos
+        const creditsElement = document.getElementById('credits');
+        creditsElement.textContent = "Agradecemos por jogar! Quiz criado por Marcio José Gomes Nory de Souza.";
+        creditsElement.style.display = 'block';
+    }
+
+    // Iniciar o quiz
+    showQuestion();
+</script>
+
+</body>
+</html>
